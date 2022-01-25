@@ -68,6 +68,28 @@ const server = net.createServer(function (socket) {
     data = data.toString();
     myEmitter.emit("broadcast", id, data);
   });
+  socket.on("data", function (data) {
+    // 이것도 가능
+    myEmitter.emit("broadcast");
+
+    // 이게 짜세인거야 아시겠어요?
+    // 이게 클라이언트에게 data 쓰기
+    socket.write(data);
+  });
+
+  socket.on("close", function () {
+    myEmitter.emit("leave", id);
+  });
+
+  socket.on("data", function (data) {
+    data = data.toString();
+    if (data == "shutdown") {
+      myEmitter.emit("shutdown");
+    }
+    myEmitter.emit("broadcast", id, data);
+  });
+  // 서버 종료하지 않고 채팅 종료
+  // myEmitter.removeAllListeners
 });
 // 한번은 once
 
